@@ -1,0 +1,72 @@
+services:
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Mohajer123456
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "mysql -uroot -pMohajer123456 -e 'SELECT 1'" ]
+      interval: 120s
+      retries: 1
+      start_period: 240s
+    volumes:
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - mynetwork
+
+#  journex:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile-journex
+#    container_name: journex-app
+#    ports:
+#      - "9090:9090"
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#      ollama:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+#    restart: unless-stopped
+#    networks:
+#      - mynetwork
+
+#  ollama:
+#    image: ollama/ollama
+#    container_name: journex-ollama
+#    ports:
+#      - "11434:11434"
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD-SHELL", "ollama pull all-minilm:22m
+##      && ollama pull gemma:2b
+##      && ollama pull llava:7b
+#      "]
+#      interval: 120s
+#      retries: 1
+#      start_period: 240s
+#    networks:
+#      - mynetwork
+
+#  redis:
+#    image: redis/redis-stack-server
+#    container_name: journex-redis
+#    ports:
+#      - "6379:6379"
+#    restart: unless-stopped
+#    healthcheck:
+#      test: [ "CMD-SHELL", "redis-cli ping" ]
+#      interval: 10s
+#      retries: 1
+#      start_period: 60s
+#    networks:
+#      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

@@ -10,5 +10,4 @@ public class JournexApplication {
         SpringApplication.run(JournexApplication.class, args);
     }
 
-
 }
