@@ -18,23 +18,19 @@ services:
     networks:
       - mynetwork
 
-#  journex:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-journex
-#    container_name: journex-app
-#    ports:
-#      - "9090:9090"
-#    depends_on:
-#      mysql:
-#        condition: service_healthy
-#      ollama:
-#        condition: service_healthy
-#      redis:
-#        condition: service_healthy
-#    restart: unless-stopped
-#    networks:
-#      - mynetwork
+  redis:
+    image: redis/redis-stack-server
+    container_name: journex-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping" ]
+      interval: 10s
+      retries: 1
+      start_period: 60s
+    networks:
+      - mynetwork
 
 #  ollama:
 #    image: ollama/ollama
@@ -53,17 +49,21 @@ services:
 #    networks:
 #      - mynetwork
 
-#  redis:
-#    image: redis/redis-stack-server
-#    container_name: journex-redis
+#  journex:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile-journex
+#    container_name: journex-app
 #    ports:
-#      - "6379:6379"
+#      - "9090:9090"
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#      ollama:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
 #    restart: unless-stopped
-#    healthcheck:
-#      test: [ "CMD-SHELL", "redis-cli ping" ]
-#      interval: 10s
-#      retries: 1
-#      start_period: 60s
 #    networks:
 #      - mynetwork
 
