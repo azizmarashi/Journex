@@ -2,7 +2,7 @@ package org.example.journex.service;
 
 import org.example.journex.configs.exception.JournexException;
 import org.example.journex.dao.ChecklistQuestionRepository;
-import org.example.journex.domain.ChecklistQuestion;
+import org.example.journex.domain.ChecklistItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +17,13 @@ public class ChecklistQuestionOrderingService {
     private ChecklistQuestionRepository repository;
 
     public void reserveSlotForInsert(Long checklistId, Long newOrder) {
-        List<ChecklistQuestion> questions =
+        List<ChecklistItem> questions =
                 repository.findByChecklistIdAndOrderIndexGreaterThanEqualOrderByOrderIndex(
                         checklistId, newOrder);
 
         Collections.reverse(questions);
 
-        for (ChecklistQuestion q : questions) {
+        for (ChecklistItem q : questions) {
             q.setOrderIndex(q.getOrderIndex() + 1);
         }
         repository.saveAll(questions);
@@ -34,18 +34,18 @@ public class ChecklistQuestionOrderingService {
             return;
         }
 
-        List<ChecklistQuestion> questions =
+        List<ChecklistItem> questions =
                 repository.findByChecklistIdOrderByOrderIndex(checklistId);
 
         if (oldOrder < newOrder) {
-            for (ChecklistQuestion q : questions) {
+            for (ChecklistItem q : questions) {
                 if (q.getOrderIndex() > oldOrder && q.getOrderIndex() <= newOrder) {
                     q.setOrderIndex(q.getOrderIndex() - 1);
                 }
             }
         } else {
             Collections.reverse(questions);
-            for (ChecklistQuestion q : questions) {
+            for (ChecklistItem q : questions) {
                 if (q.getOrderIndex() >= newOrder && q.getOrderIndex() < oldOrder) {
                     q.setOrderIndex(q.getOrderIndex() + 1);
                 }
@@ -56,11 +56,11 @@ public class ChecklistQuestionOrderingService {
     }
 
     public void closeSlotAfterDelete(Long checklistId, Long deletedOrder) {
-        List<ChecklistQuestion> questions =
+        List<ChecklistItem> questions =
                 repository.findByChecklistIdAndOrderIndexGreaterThanOrderByOrderIndex(
                         checklistId, deletedOrder);
 
-        for (ChecklistQuestion q : questions) {
+        for (ChecklistItem q : questions) {
             q.setOrderIndex(q.getOrderIndex() - 1);
         }
         repository.saveAll(questions);

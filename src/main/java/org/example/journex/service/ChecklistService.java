@@ -23,26 +23,29 @@ public class ChecklistService {
     @Autowired
     private StrategyRepository strategyRepository;
 
-    public Long save (ChecklistDto dto){
+    @Autowired
+    private AuthService authService;
 
-        Strategy strategy = strategyRepository.findById(dto.getStrategyId())
-                .orElseThrow(() -> new JournexException("error.strategy.notFound"));
+    public Long save (ChecklistDto dto){
 
         Checklist checklist = new Checklist();
         checklist.setName(dto.getName());
         checklist.setDescription(dto.getDescription());
         checklist.setScope(dto.getScope());
-        checklist.setStrategy(strategy);
         checklist.setActive(dto.getActive());
         checklist.setCreatedAt(LocalDateTime.now());
-        checklist.setUpdatedAt(null);
+        checklist.setUser(authService.getCurrentUser());
+        Strategy strategy = strategyRepository.findById(dto.getStrategyId()).orElse(null);
+        if (!strategy.getUser().getId().equals(authService.getCurrentUser().getId()))
+            throw new JournexException("error.access.denied");
+        checklist.setStrategy(strategy);
 
         checklistRepository.save(checklist);
 
         return checklist.getId();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Long update(Long id, ChecklistDto dto){
 
         Checklist checklist =checklistRepository.findById(id)
@@ -58,7 +61,7 @@ public class ChecklistService {
         return checklist.getId();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void delete(Long ChecklistId){
         Checklist checklist =checklistRepository
                 .findById(ChecklistId).orElseThrow(() -> new JournexException("error.checklist.notFound"));
@@ -68,13 +71,17 @@ public class ChecklistService {
         checklistRepository.save(checklist);
     }
 
-    @Transactional(readOnly = true)
     public ChecklistDto findById(Long id) {
 
         Checklist checklist = checklistRepository.findById(id)
                 .orElseThrow(() -> new JournexException("error.checklist.notFound"));
 
+        if (!checklist.getUser().getId().equals(authService.getCurrentUser().getId())){
+            throw new JournexException("error.access.denied");
+        }
+
         ChecklistDto dto = new ChecklistDto();
+        dto.setId(checklist.getId());
         dto.setName(checklist.getName());
         dto.setDescription(checklist.getDescription());
         dto.setScope(checklist.getScope());
@@ -85,7 +92,6 @@ public class ChecklistService {
         return dto;
     }
 
-    @Transactional(readOnly = true)
     public List<ChecklistDto> findAllByStrategy(Long strategyId, Pagination pagination) {
 
         Page<Checklist> checklists =

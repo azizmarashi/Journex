@@ -50,10 +50,6 @@ public class User {
     private Boolean enabled;
 
     @NotNull
-    @Column(name = "locked")
-    private Boolean locked;
-
-    @NotNull
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

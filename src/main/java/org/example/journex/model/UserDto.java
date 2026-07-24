@@ -15,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDto {
 
+    private Long id;
+
     private String profileImageUrl;
 
     @NotNull
@@ -32,9 +34,6 @@ public class UserDto {
     private Boolean enabled;
 
     @NotNull
-    private Boolean locked;
-
-    @NotNull
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -43,7 +42,7 @@ public class UserDto {
 
     private LocalDateTime subscriptionExpireAt;
 
-    private List<StrategyDto> strategies;
+    private List<Long> strategyIds;
 
     private SubscriptionPlan subscriptionPlan;
 

@@ -15,6 +15,8 @@ import java.util.List;
 @Data
 public class StrategyDto {
 
+    private Long id;
+
     @NotNull
     private String address;
 
@@ -23,10 +25,9 @@ public class StrategyDto {
 
     private String description;
 
-    private List<ChecklistDto> checklists;
+    private List<Long> checklistIds;
 
-    @NotNull
-    private UserDto user;
+    private Long userId;
 
     private TradeType tradeType;
 
@@ -39,12 +40,6 @@ public class StrategyDto {
     private Long reward;
 
     private Long riskPercent;
-
-    @NotNull
-    private Boolean active;
-
-    @NotNull
-    private Boolean publicStrategy;
 
     @NotNull
     private LocalDateTime createdAt;

@@ -5,8 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.journex.enums.ChecklistCategory;
 import org.example.journex.enums.ChecklistScope;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -31,8 +33,12 @@ public class Checklist {
     @Enumerated(EnumType.STRING)
     private ChecklistScope scope;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "strategy_id", nullable = false)
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ChecklistCategory checklistCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "strategy_id", nullable = true)
     private Strategy strategy;
 
     @OneToMany(
@@ -41,7 +47,15 @@ public class Checklist {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    private List<ChecklistQuestion> questions;
+    private List<ChecklistItem> items = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @NotNull
+    @Column(name = "public_checklist")
+    private Boolean publicChecklist;
 
     @NotNull
     @Column(name = "active")

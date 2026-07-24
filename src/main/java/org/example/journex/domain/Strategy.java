@@ -9,12 +9,13 @@ import org.example.journex.enums.TradeMarketType;
 import org.example.journex.enums.TradeType;
 import org.example.journex.enums.TradeTimeframe;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "strategy_tb" , schema = "journex_db")
+@Table(name = "strategy_tb", schema = "journex_db")
 @Data
 public class Strategy {
 
@@ -39,7 +40,7 @@ public class Strategy {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Checklist> checklists;
+    private List<Checklist> checklists = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -67,19 +68,20 @@ public class Strategy {
     private Long riskPercent;
 
     @NotNull
-    @Column(name = "active")
-    private Boolean active;
-
-    //todo fix and customize
-    @NotNull
     @Column(name = "public_strategy")
     private Boolean publicStrategy;
 
+    @Column(name = "deleted")
+    private Boolean deleted;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @NotNull
-    @Column(name="created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name="updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
 }

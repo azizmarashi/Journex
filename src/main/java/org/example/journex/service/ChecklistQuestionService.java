@@ -4,8 +4,8 @@ import org.example.journex.configs.exception.JournexException;
 import org.example.journex.dao.ChecklistQuestionRepository;
 import org.example.journex.dao.ChecklistRepository;
 import org.example.journex.domain.Checklist;
-import org.example.journex.domain.ChecklistQuestion;
-import org.example.journex.model.ChecklistQuestionDto;
+import org.example.journex.domain.ChecklistItem;
+import org.example.journex.model.ChecklistItemDto;
 import org.example.journex.model.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ public class ChecklistQuestionService {
     @Autowired
     private ChecklistQuestionOrderingService orderingService;
 
-    public Long save (ChecklistQuestionDto model){
+    public Long save (ChecklistItemDto model){
 
         Checklist checklist = checklistRepository.findById(model.getChecklistId())
                 .orElseThrow(() -> new JournexException("error.checklist.notFound"));
@@ -33,11 +33,10 @@ public class ChecklistQuestionService {
         orderingService.validateOrderIndex(model.getChecklistId(), model.getOrderIndex(), false);
         orderingService.reserveSlotForInsert(model.getChecklistId(), model.getOrderIndex());
 
-        ChecklistQuestion entity = new ChecklistQuestion();
+        ChecklistItem entity = new ChecklistItem();
         entity.setChecklist(checklist);
         entity.setChecklistQuestion(model.getChecklistQuestion());
-        entity.setQuestionType(model.getQuestionType());
-        entity.setChecklistCategory(model.getChecklistCategory());
+        entity.setItemType(model.getQuestionType());
         entity.setRequired(model.getRequired());
         entity.setOrderIndex(model.getOrderIndex());
 
@@ -46,9 +45,9 @@ public class ChecklistQuestionService {
         return entity.getId();
     }
 
-    public Long update(Long checklistQuestionId, ChecklistQuestionDto dto) {
+    public Long update(Long checklistQuestionId, ChecklistItemDto dto) {
 
-        ChecklistQuestion entity = checklistQuestionRepository.findById(checklistQuestionId)
+        ChecklistItem entity = checklistQuestionRepository.findById(checklistQuestionId)
                 .orElseThrow(() -> new JournexException("error.question.notFound"));
 
         Checklist checklist = checklistRepository.findById(dto.getChecklistId())
@@ -70,8 +69,7 @@ public class ChecklistQuestionService {
         }
 
         entity.setChecklistQuestion(dto.getChecklistQuestion());
-        entity.setQuestionType(dto.getQuestionType());
-        entity.setChecklistCategory(dto.getChecklistCategory());
+        entity.setItemType(dto.getQuestionType());
         entity.setChecklist(checklist);
         entity.setRequired(dto.getRequired());
         entity.setOrderIndex(dto.getOrderIndex());
@@ -82,7 +80,7 @@ public class ChecklistQuestionService {
     }
 
     public void delete (Long questionId){
-        ChecklistQuestion question = checklistQuestionRepository.findById(questionId)
+        ChecklistItem question = checklistQuestionRepository.findById(questionId)
                 .orElseThrow(() -> new JournexException("error.question.notFound"));
 
         Long checklistId = question.getChecklist().getId();
@@ -92,36 +90,34 @@ public class ChecklistQuestionService {
         orderingService.closeSlotAfterDelete(checklistId, deletedOrder);
     }
 
-    public ChecklistQuestionDto findById(Long questionId){
+    public ChecklistItemDto findById(Long questionId){
 
-        ChecklistQuestion question = checklistQuestionRepository.findById(questionId)
+        ChecklistItem question = checklistQuestionRepository.findById(questionId)
                 .orElseThrow(() -> new JournexException("error.question.notFound"));
 
-        ChecklistQuestionDto dto = new ChecklistQuestionDto();
+        ChecklistItemDto dto = new ChecklistItemDto();
 
         dto.setChecklistId(question.getChecklist().getId());
         dto.setChecklistQuestion(question.getChecklistQuestion());
-        dto.setQuestionType(question.getQuestionType());
-        dto.setChecklistCategory(question.getChecklistCategory());
+        dto.setQuestionType(question.getItemType());
         dto.setRequired(question.getRequired());
         dto.setOrderIndex(question.getOrderIndex());
 
         return dto;
     }
 
-    public Page<ChecklistQuestionDto> findAllByChecklistId(Long checklistId, Pagination pagination){
+    public Page<ChecklistItemDto> findAllByChecklistId(Long checklistId, Pagination pagination){
 
         Checklist checklist = checklistRepository.findById(checklistId)
                 .orElseThrow(() -> new JournexException("error.checklist.notFound"));
 
-        Page<ChecklistQuestion> entityPage =
+        Page<ChecklistItem> entityPage =
                 checklistQuestionRepository.findAllByChecklistId(checklistId, pagination.toPageable());
 
         return entityPage.map(entity -> {
-            ChecklistQuestionDto dto = new ChecklistQuestionDto();
+            ChecklistItemDto dto = new ChecklistItemDto();
             dto.setChecklistQuestion(entity.getChecklistQuestion());
-            dto.setQuestionType(entity.getQuestionType());
-            dto.setChecklistCategory(entity.getChecklistCategory());
+            dto.setQuestionType(entity.getItemType());
             dto.setChecklistId(entity.getChecklist().getId());
             dto.setRequired(entity.getRequired());
             dto.setOrderIndex(entity.getOrderIndex());

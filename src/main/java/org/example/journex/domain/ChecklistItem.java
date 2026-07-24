@@ -5,31 +5,25 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.journex.enums.ChecklistCategory;
-import org.example.journex.enums.ChecklistQuestionType;
+import org.example.journex.enums.ChecklistItemType;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Data
-@Table(name = "checklist_question_tb" , schema = "journex_db")
-public class ChecklistQuestion {
+@Table(name = "checklist_item_tb" , schema = "journex_db")
+public class ChecklistItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "checklist_question")
-    private String checklistQuestion;
+    @Column(name = "value")
+    private String value;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ChecklistQuestionType questionType;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private ChecklistCategory checklistCategory;
+    private ChecklistItemType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "checklist_id", nullable = false)
