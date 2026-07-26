@@ -1,5 +1,6 @@
 package org.example.journex.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.example.journex.model.Pagination;
 import org.example.journex.model.StrategyDto;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/strategy")
 public class StrategyController {

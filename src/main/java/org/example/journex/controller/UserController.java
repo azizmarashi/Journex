@@ -1,5 +1,6 @@
 package org.example.journex.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.example.journex.model.ChangePasswordDto;
 import org.example.journex.model.UpdateProfileDto;
@@ -8,6 +9,7 @@ import org.example.journex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -20,19 +22,14 @@ public class UserController {
         return userService.getCurrentProfile();
     }
 
-    @PutMapping("/me")
+    @PutMapping("/update")
     public UserDto updateProfile(@Valid @RequestBody UpdateProfileDto dto) {
         return userService.updateProfile(dto);
     }
 
-    @PostMapping("/me/change-password")
+    @PostMapping("/change-password")
     public void changePassword(@Valid @RequestBody ChangePasswordDto dto) {
         userService.changePassword(dto);
-    }
-
-    @GetMapping("/me/subscription/is-active")
-    public boolean hasActiveSubscription() {
-        return userService.hasActiveSubscription();
     }
 
 }

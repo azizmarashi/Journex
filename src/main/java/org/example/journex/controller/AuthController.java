@@ -1,5 +1,6 @@
 package org.example.journex.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.example.journex.model.LoginRequest;
 import org.example.journex.model.RegisterRequest;
@@ -7,6 +8,7 @@ import org.example.journex.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
