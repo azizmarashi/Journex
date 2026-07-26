@@ -1,6 +1,6 @@
 package org.example.journex.service;
 
-import org.example.journex.configs.exception.JournexException;
+import org.example.journex.config.exception.JournexException;
 import org.example.journex.dao.ChecklistItemRepository;
 import org.example.journex.domain.ChecklistItem;
 import org.springframework.beans.factory.annotation.Autowired;

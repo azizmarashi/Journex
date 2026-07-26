@@ -1,6 +1,6 @@
 package org.example.journex.service;
 
-import org.example.journex.configs.exception.JournexException;
+import org.example.journex.config.exception.JournexException;
 import org.example.journex.dao.UserRepository;
 import org.example.journex.domain.User;
 import org.example.journex.mapper.UserMapper;

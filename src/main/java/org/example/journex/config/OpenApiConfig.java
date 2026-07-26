@@ -1,4 +1,4 @@
-package org.example.journex.configs;
+package org.example.journex.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;

@@ -1,4 +1,4 @@
-package org.example.journex.configs.exception;
+package org.example.journex.config.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

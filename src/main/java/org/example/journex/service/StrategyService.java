@@ -1,6 +1,6 @@
 package org.example.journex.service;
 
-import org.example.journex.configs.exception.JournexException;
+import org.example.journex.config.exception.JournexException;
 import org.example.journex.dao.ChecklistRepository;
 import org.example.journex.dao.StrategyRepository;
 import org.example.journex.domain.Strategy;
