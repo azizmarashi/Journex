@@ -18,7 +18,7 @@ public class ChecklistItemController {
     @Autowired
     private ChecklistItemService checklistItemService;
 
-    @PostMapping
+    @PostMapping("/add-question")
     public Long addQuestion(@Valid @RequestBody ChecklistItemDto dto) {
         return checklistItemService.addQuestion(dto);
     }
