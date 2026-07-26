@@ -16,17 +16,20 @@ public interface StrategyMapper {
     @Mapping(target = "checklists", ignore = true)
     Strategy toEntity(StrategyDto dto);
 
+    @Named("toDto")
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "checklistIds", source = "checklists", qualifiedByName = "activeChecklistsToIds")
     StrategyDto toDto(Strategy entity);
 
+    @Named("toPublicDto")
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "checklistIds", source = "checklists", qualifiedByName = "publicActiveChecklistsToIds")
     StrategyDto toPublicDto(Strategy entity);
 
-    List<Strategy> toEntities(List<StrategyDto> dtos);
-
+    @IterableMapping(qualifiedByName = "toDto")
     List<StrategyDto> toDtos(List<Strategy> entities);
+
+    List<Strategy> toEntities(List<StrategyDto> dtos);
 
     default List<StrategyDto> toPublicDtos(List<Strategy> entities) {
         if (entities == null) {

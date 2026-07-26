@@ -30,7 +30,7 @@ public class UserController {
         userService.changePassword(dto);
     }
 
-    @GetMapping("/me/subscription/active")
+    @GetMapping("/me/subscription/is-active")
     public boolean hasActiveSubscription() {
         return userService.hasActiveSubscription();
     }

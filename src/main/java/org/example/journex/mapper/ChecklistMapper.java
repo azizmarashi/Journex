@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ChecklistMapper {
 
-    @Mapping(target = "strategy", ignore = true)
     @Mapping(target = "user", source = "userId", qualifiedByName = "userFromId")
     @Mapping(target = "items", ignore = true)
     @Mapping(target = "strategies", ignore = true)

@@ -101,7 +101,6 @@ public class SecurityConfig extends OncePerRequestFilter {
                     .withUsername(user.getUsername())
                     .password(user.getPassword())
                     .disabled(!user.getEnabled())
-                    .accountLocked(user.getLocked())
                     .roles(user.getRole().name())
                     .build();
         };

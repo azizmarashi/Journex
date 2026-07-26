@@ -31,7 +31,7 @@ public class ChecklistItemController {
         return checklistItemService.update(itemId, dto);
     }
 
-    @PatchMapping("/{itemId}/move")
+    @PutMapping("/{itemId}/move")
     public void move(@PathVariable Long itemId, @RequestParam Long newOrder) {
         checklistItemService.move(itemId, newOrder);
     }

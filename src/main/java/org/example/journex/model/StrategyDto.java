@@ -1,5 +1,6 @@
 package org.example.journex.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 public class StrategyDto {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     @NotNull
@@ -25,6 +27,8 @@ public class StrategyDto {
     private String name;
 
     private String description;
+
+    private Long userId;
 
     private List<Long> checklistIds;
 
