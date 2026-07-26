@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.example.journex.enums.TradeMarketType;
 import org.example.journex.enums.TradeType;
 import org.example.journex.enums.TradeTimeframe;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
