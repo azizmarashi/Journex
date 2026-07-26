@@ -1,7 +1,7 @@
 package org.example.journex.service;
 
 import org.example.journex.configs.exception.JournexException;
-import org.example.journex.dao.ChecklistQuestionRepository;
+import org.example.journex.dao.ChecklistItemRepository;
 import org.example.journex.domain.ChecklistItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,14 +11,14 @@ import java.util.List;
 
 @Service
 @Transactional
-public class ChecklistQuestionOrderingService {
+public class ChecklistItemOrderingService {
 
     @Autowired
-    private ChecklistQuestionRepository repository;
+    private ChecklistItemRepository repository;
 
     public void reserveSlotForInsert(Long checklistId, Long newOrder) {
         List<ChecklistItem> questions =
-                repository.findByChecklistIdAndOrderIndexGreaterThanEqualOrderByOrderIndex(
+                repository.orderingFindByChecklistIdGreaterOrder(
                         checklistId, newOrder);
 
         Collections.reverse(questions);
@@ -35,7 +35,7 @@ public class ChecklistQuestionOrderingService {
         }
 
         List<ChecklistItem> questions =
-                repository.findByChecklistIdOrderByOrderIndex(checklistId);
+                repository.orderingFindByChecklistIdOrder(checklistId);
 
         if (oldOrder < newOrder) {
             for (ChecklistItem q : questions) {
@@ -57,7 +57,7 @@ public class ChecklistQuestionOrderingService {
 
     public void closeSlotAfterDelete(Long checklistId, Long deletedOrder) {
         List<ChecklistItem> questions =
-                repository.findByChecklistIdAndOrderIndexGreaterThanOrderByOrderIndex(
+                repository.orderingFindByChecklistIdAndOrderGreaterOrder(
                         checklistId, deletedOrder);
 
         for (ChecklistItem q : questions) {
@@ -67,7 +67,7 @@ public class ChecklistQuestionOrderingService {
     }
 
     public long countByChecklistId(Long checklistId) {
-        return repository.countByChecklistId(checklistId);
+        return repository.orderingCountByChecklistId(checklistId);
     }
 
     public void validateOrderIndex(Long checklistId, Long orderIndex, boolean isMoveOfExisting) {

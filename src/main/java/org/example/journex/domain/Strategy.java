@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.example.journex.enums.TradeMarketType;
 import org.example.journex.enums.TradeType;
 import org.example.journex.enums.TradeTimeframe;
+import org.hibernate.annotations.Where;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +37,16 @@ public class Strategy {
     @Column(columnDefinition = "LONGTEXT")
     private String description;
 
-    @OneToMany(
-            mappedBy = "strategy",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+    @ManyToMany(
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            }
+    )
+    @JoinTable(
+            name = "strategy_checklist_tb",
+            joinColumns = @JoinColumn(name = "strategy_id"),
+            inverseJoinColumns = @JoinColumn(name = "checklist_id")
     )
     private List<Checklist> checklists = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package org.example.journex.model;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +28,6 @@ public class StrategyDto {
 
     private List<Long> checklistIds;
 
-    private Long userId;
-
     private TradeType tradeType;
 
     private TradeMarketType tradeMarketType;
@@ -41,9 +40,16 @@ public class StrategyDto {
 
     private Long riskPercent;
 
+    private Boolean publicStrategy;
+
     @NotNull
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Boolean deleted;
+
+    private LocalDateTime deletedAt;
+
 
 }

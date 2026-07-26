@@ -2,9 +2,9 @@ package org.example.journex.service;
 
 import org.example.journex.configs.exception.JournexException;
 import org.example.journex.dao.ChecklistRepository;
-import org.example.journex.dao.StrategyRepository;
 import org.example.journex.domain.Checklist;
-import org.example.journex.domain.Strategy;
+import org.example.journex.domain.User;
+import org.example.journex.mapper.ChecklistMapper;
 import org.example.journex.model.ChecklistDto;
 import org.example.journex.model.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,100 +22,94 @@ public class ChecklistService {
     private ChecklistRepository checklistRepository;
 
     @Autowired
-    private StrategyRepository strategyRepository;
+    private ChecklistMapper checklistMapper;
 
     @Autowired
     private AuthService authService;
 
-    public Long save (ChecklistDto dto){
-
-        Checklist checklist = new Checklist();
-        checklist.setName(dto.getName());
-        checklist.setDescription(dto.getDescription());
-        checklist.setScope(dto.getScope());
-        checklist.setActive(dto.getActive());
+    @Transactional
+    public Long save(ChecklistDto dto) {
+        User user = authService.getCurrentUser();
+        Checklist checklist = checklistMapper.toEntity(dto);
+        checklist.setUser(user);
         checklist.setCreatedAt(LocalDateTime.now());
-        checklist.setUser(authService.getCurrentUser());
-        Strategy strategy = strategyRepository.findById(dto.getStrategyId()).orElse(null);
-        if (!strategy.getUser().getId().equals(authService.getCurrentUser().getId()))
-            throw new JournexException("error.access.denied");
-        checklist.setStrategy(strategy);
-
-        checklistRepository.save(checklist);
-
-        return checklist.getId();
+        checklist.setDeleted(false);
+        Checklist saved = checklistRepository.save(checklist);
+        return saved.getId();
     }
 
-    @Transactional(readOnly = true)
-    public Long update(Long id, ChecklistDto dto){
-
-        Checklist checklist =checklistRepository.findById(id)
+    @Transactional
+    public Long update(Long checklistId, ChecklistDto dto) {
+        User user = authService.getCurrentUser();
+        Checklist checklist = checklistRepository.findByIdAndUserId(checklistId, user.getId())
                 .orElseThrow(() -> new JournexException("error.checklist.notFound"));
-
-        checklist.setName(dto.getName());
-        checklist.setDescription(dto.getDescription());
-        checklist.setScope(dto.getScope());
-        checklist.setActive(dto.getActive());
+        checklistMapper.updateEntityFromDto(dto, checklist);
         checklist.setUpdatedAt(LocalDateTime.now());
-
-        checklistRepository.save(checklist);
-        return checklist.getId();
+        Checklist saved = checklistRepository.save(checklist);
+        return saved.getId();
     }
 
     @Transactional(readOnly = true)
-    public void delete(Long ChecklistId){
-        Checklist checklist =checklistRepository
-                .findById(ChecklistId).orElseThrow(() -> new JournexException("error.checklist.notFound"));
+    public Page<ChecklistDto> findAllByUserId(Pagination pagination) {
+        User user = authService.getCurrentUser();
+        Page<Checklist> page = checklistRepository.findAllByUserId(user.getId(), pagination.toPageable());
+        return page.map(checklistMapper::toDto);
+    }
 
+    @Transactional(readOnly = true)
+    public Page<ChecklistDto> findAllActives(Pagination pagination) {
+        User user = authService.getCurrentUser();
+        Page<Checklist> page = checklistRepository.findAllActives(user.getId(), pagination.toPageable());
+        return page.map(checklistMapper::toDto);
+    }
+
+    public Page<ChecklistDto> findActivesByStrategyId(Long strategyId, Pagination pagination){
+        User user = authService.getCurrentUser();
+        Page<Checklist> page = checklistRepository.findActivesByStrategyId(user.getId(), strategyId, pagination.toPageable());
+        return page.map(checklistMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ChecklistDto> findAllDeleted(Pagination pagination) {
+        User user = authService.getCurrentUser();
+        Page<Checklist> page = checklistRepository.findAllDeleted(user.getId(), pagination.toPageable());
+        return page.map(checklistMapper::toDto);
+    }
+
+    @Transactional
+    public void softDelete(Long checklistId) {
+        User user = authService.getCurrentUser();
+        Checklist checklist = checklistRepository.findByIdAndUserId(checklistId, user.getId())
+                .orElseThrow(() -> new JournexException("error.checklist.notFound"));
         checklist.setDeleted(true);
+        checklist.setActive(false);
         checklist.setDeletedAt(LocalDateTime.now());
         checklistRepository.save(checklist);
     }
 
-    public ChecklistDto findById(Long id) {
-
-        Checklist checklist = checklistRepository.findById(id)
+    @Transactional
+    public void restoreDeleted(Long checklistId) {
+        User user = authService.getCurrentUser();
+        Checklist checklist = checklistRepository.findDeleted(checklistId, user.getId())
                 .orElseThrow(() -> new JournexException("error.checklist.notFound"));
+        checklist.setDeleted(false);
+        checklist.setDeletedAt(null);
+        checklistRepository.save(checklist);
+    }
 
-        if (!checklist.getUser().getId().equals(authService.getCurrentUser().getId())){
-            throw new JournexException("error.access.denied");
+
+    @Transactional
+    public List<Checklist> resolveChecklists(List<Long> checklistIds, User currentUser) {
+        List<Checklist> checklists = checklistRepository.findAllByIds(checklistIds);
+        if (checklists.size() != checklistIds.size())
+            throw new JournexException("error.checklist.notFound");
+        for (Checklist checklist : checklists) {
+            boolean isOwner = checklist.getUser().getId().equals(currentUser.getId());
+            boolean isPublic = Boolean.TRUE.equals(checklist.getPublicChecklist());
+            if (!isOwner && !isPublic)
+                throw new JournexException("error.checklist.accessDenied");
         }
-
-        ChecklistDto dto = new ChecklistDto();
-        dto.setId(checklist.getId());
-        dto.setName(checklist.getName());
-        dto.setDescription(checklist.getDescription());
-        dto.setScope(checklist.getScope());
-        dto.setStrategyId(checklist.getStrategy().getId());
-        dto.setActive(checklist.getActive());
-        dto.setCreatedAt(checklist.getCreatedAt());
-        dto.setUpdatedAt(checklist.getUpdatedAt());
-        return dto;
+        return new ArrayList<>(checklists);
     }
-
-    public List<ChecklistDto> findAllByStrategy(Long strategyId, Pagination pagination) {
-
-        Page<Checklist> checklists =
-                checklistRepository.findAllByStrategyId(strategyId, pagination.toPageable());
-
-        return checklists.stream()
-                .map(checklist -> {
-
-                    ChecklistDto dto = new ChecklistDto();
-
-                    dto.setName(checklist.getName());
-                    dto.setDescription(checklist.getDescription());
-                    dto.setScope(checklist.getScope());
-                    dto.setStrategyId(checklist.getStrategy().getId());
-                    dto.setActive(checklist.getActive());
-                    dto.setCreatedAt(checklist.getCreatedAt());
-                    dto.setUpdatedAt(checklist.getUpdatedAt());
-                    return dto;
-
-                }).toList();
-
-    }
-
-    //todo find all by userId
 
 }

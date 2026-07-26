@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.journex.enums.ChecklistCategory;
 import org.example.journex.enums.ChecklistScope;
+import org.hibernate.annotations.Where;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +39,8 @@ public class Checklist {
     @Enumerated(EnumType.STRING)
     private ChecklistCategory checklistCategory;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "strategy_id", nullable = true)
-    private Strategy strategy;
+    @ManyToMany(mappedBy = "checklists")
+    private List<Strategy> strategies = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "checklist",
@@ -61,15 +62,15 @@ public class Checklist {
     @Column(name = "active")
     private Boolean active;
 
-    @Column(name = "deleted")
-    private Boolean deleted;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted")
+    private Boolean deleted;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

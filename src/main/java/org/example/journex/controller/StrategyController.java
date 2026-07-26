@@ -21,18 +21,18 @@ public class StrategyController {
     }
 
     @PutMapping("/update/{id}")
-    public Long update( @PathVariable Long id, @Valid @RequestBody StrategyDto dto) {
+    public Long update(@PathVariable Long id, @Valid @RequestBody StrategyDto dto) {
         return strategyService.update(id, dto);
     }
 
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Long id) {
-        strategyService.delete(id);
+        strategyService.softDelete(id);
     }
 
-    @GetMapping("/find-all")
-    public Page<StrategyDto> findAll(Pagination pagination) {
-        return strategyService.findAll(pagination);
+    @PutMapping("/restore/{id}")
+    public void restoreDeleted(@PathVariable Long id){
+        strategyService.restoreDeleted(id);
     }
 
     @GetMapping("/{id}")
@@ -40,9 +40,14 @@ public class StrategyController {
         return strategyService.findById(id);
     }
 
-    @GetMapping("/{address}")
-    public StrategyDto findByAddress(@PathVariable String address) {
-        return strategyService.findByAddress(address);
+    @GetMapping("/find-all")
+    public Page<StrategyDto> findAll(Pagination pagination) {
+        return strategyService.findAll(pagination);
+    }
+
+    @GetMapping("/find-all-deleted")
+    public Page<StrategyDto> findAllDeleted(Pagination pagination) {
+        return strategyService.findAllDeleted(pagination);
     }
 
     @GetMapping("/public/{address}")

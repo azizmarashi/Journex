@@ -76,12 +76,8 @@ public class AuthService {
     }
 
     public boolean validate(String token){
-
         try {
-            if (isBlacklisted(token)) {
-                return false;
-            }
-
+            if (isBlacklisted(token)) return false;
             Jwts.parser()
                     .setSigningKey(key)
                     .parseClaimsJws(token);
@@ -90,39 +86,27 @@ public class AuthService {
         } catch (Exception e) {
             return false;
         }
-
     }
 
     public Long register(RegisterRequest request) {
-
-
-        if(userRepository.existsByUsername(request.getUsername())){
+        if(userRepository.existsByUsername(request.getUsername()))
             throw new JournexException("error.username.exists");
-        }
-
-        if(userRepository.existsByEmail(request.getEmail())){
+        if(userRepository.existsByEmail(request.getEmail()))
             throw new JournexException("error.email.exists");
-        }
-
         User user = new User();
         user.setUsername(request.getUsername());
         user.setNickname(request.getNickname());
         user.setEmail(request.getEmail());
         user.setCreatedAt(LocalDateTime.now());
-
-
         user.setPassword(
                 passwordEncoder.encode(
                         request.getPassword()
                 )
         );
-
         user.setRole(UserRole.USER);
         user.setEnabled(true);
-        user.setLocked(false);
         userRepository.save(user);
         return user.getId();
-
     }
 
     public String login(LoginRequest request) {
@@ -133,34 +117,22 @@ public class AuthService {
                                 request.getPassword()
                         )
                 );
-
-        if(!authentication.isAuthenticated()){
-            throw new JournexException("error.login.failed");}
-
+        if(!authentication.isAuthenticated())
+            throw new JournexException("error.login.failed");
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new JournexException("error.user.notFound"));
-
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
-
         return generateToken(user.getUsername());
-
     }
 
     public String logout(String token) {
-
-        if(token == null || !token.startsWith("Bearer ")) {
+        if(token == null || !token.startsWith("Bearer "))
             throw new JournexException("error.token.invalid");
-        }
-
         token = token.substring(7);
-
-        if(!validate(token)) {
+        if(!validate(token))
             throw new JournexException("error.token.invalid");
-        }
-
         long remainingMillis = extractExpirationTime(token) - System.currentTimeMillis();
-
         if (remainingMillis > 0) {
             redisTemplate.opsForValue().set(
                     blacklistPrefix + token,
@@ -169,7 +141,6 @@ public class AuthService {
                     TimeUnit.MILLISECONDS
             );
         }
-
         return "LOGOUT_SUCCESS";
     }
 
@@ -187,17 +158,13 @@ public class AuthService {
     }
 
     public User getCurrentUser(){
-
         Authentication authentication =
                 SecurityContextHolder
                         .getContext()
                         .getAuthentication();
-
         String username = authentication.getName();
-
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new JournexException("error.user.notFound"));
-
     }
 
 }

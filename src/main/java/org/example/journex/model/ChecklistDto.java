@@ -27,7 +27,7 @@ public class ChecklistDto {
     @NotNull
     private ChecklistCategory checklistCategory;
 
-    private Long strategyId;
+    private List<Long> strategyIds;
 
     @NotNull
     private Long userId;

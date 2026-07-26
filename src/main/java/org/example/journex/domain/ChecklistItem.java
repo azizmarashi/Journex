@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.journex.enums.ChecklistItemType;
+import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,4 +39,17 @@ public class ChecklistItem {
     @NotNull
     @Column(name = "order_index")
     private Long orderIndex;
+
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_question_id")
+    private ChecklistItem sourceQuestion;
+
+    @Column(name = "answered_at")
+    private LocalDateTime answeredAt;
 }
