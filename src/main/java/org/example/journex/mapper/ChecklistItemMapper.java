@@ -4,7 +4,6 @@ import org.example.journex.domain.Checklist;
 import org.example.journex.domain.ChecklistItem;
 import org.example.journex.model.ChecklistItemDto;
 import org.mapstruct.*;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)

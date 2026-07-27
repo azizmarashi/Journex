@@ -5,7 +5,6 @@ import org.example.journex.domain.Strategy;
 import org.example.journex.domain.User;
 import org.example.journex.model.StrategyDto;
 import org.mapstruct.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

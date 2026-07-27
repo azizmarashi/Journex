@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.journex.enums.ChecklistCategory;
 import org.example.journex.enums.ChecklistScope;
-import org.hibernate.annotations.Where;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

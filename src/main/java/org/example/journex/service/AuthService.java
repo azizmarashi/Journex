@@ -51,7 +51,21 @@ public class AuthService {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${jwt.loginAttemptPrefix}")
+    private String loginAttemptPrefix;
+
+    @Value("${jwt.maxLoginAttempts}")
+    private int maxLoginAttempts;
+
+    @Value("${jwt.lockoutDurationMinutes}")
+    private long lockoutDurationMinutes;
+
+    @Value("${jwt.bearerPrefix}")
+    private String bearerPrefix;
+
     private SecretKey key;
+
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @PostConstruct
     public void init() {
@@ -110,28 +124,41 @@ public class AuthService {
     }
 
     public String login(LoginRequest request) {
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                request.getUsername(),
-                                request.getPassword()
-                        )
-                );
-        if(!authentication.isAuthenticated())
-            throw new JournexException("error.login.failed");
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new JournexException("error.user.notFound"));
-        user.setLastLoginAt(LocalDateTime.now());
-        userRepository.save(user);
-        return generateToken(user.getUsername());
+
+        String username = request.getUsername();
+        checkLoginNotBlocked(username);
+        try {
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    request.getPassword()
+                            )
+                    );
+            if (!authentication.isAuthenticated()) {
+                registerFailedAttempt(username);
+                throw new JournexException("error.login.failed");
+            }
+            clearFailedAttempts(username);
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new JournexException("error.user.notFound"));
+
+            user.setLastLoginAt(LocalDateTime.now());
+            userRepository.save(user);
+            return generateToken(user.getUsername());
+        } catch (org.springframework.security.core.AuthenticationException ex) {
+            registerFailedAttempt(username);
+            throw new JournexException("error.badcredentials");
+        }
     }
 
     public String logout(String token) {
-        if(token == null || !token.startsWith("Bearer "))
+        if (token == null || !token.startsWith(BEARER_PREFIX))
             throw new JournexException("error.token.invalid");
         token = token.substring(7);
-        if(!validate(token))
+        if (!isSignatureValid(token))
             throw new JournexException("error.token.invalid");
+
         long remainingMillis = extractExpirationTime(token) - System.currentTimeMillis();
         if (remainingMillis > 0) {
             redisTemplate.opsForValue().set(
@@ -142,6 +169,34 @@ public class AuthService {
             );
         }
         return "LOGOUT_SUCCESS";
+    }
+
+    private void checkLoginNotBlocked(String username) {
+        String key = loginAttemptPrefix + username;
+        String attemptsStr = redisTemplate.opsForValue().get(key);
+        if (attemptsStr != null && Integer.parseInt(attemptsStr) >= maxLoginAttempts)
+            throw new JournexException("error.login.tooManyAttempts");
+
+    }
+
+    private void registerFailedAttempt(String username) {
+        String key = loginAttemptPrefix + username;
+        Long attempts = redisTemplate.opsForValue().increment(key);
+        if (attempts != null && attempts == 1L)
+            redisTemplate.expire(key, lockoutDurationMinutes, TimeUnit.MINUTES);
+    }
+
+    private void clearFailedAttempts(String username) {
+        redisTemplate.delete(loginAttemptPrefix + username);
+    }
+
+    private boolean isSignatureValid(String token) {
+        try {
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private long extractExpirationTime(String token) {
