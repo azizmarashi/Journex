@@ -32,6 +32,24 @@ services:
     networks:
       - mynetwork
 
+  journex:
+    build:
+      context: .
+      dockerfile: Dockerfile-journex
+    container_name: journex-app
+    ports:
+      - "9090:9090"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+#      ollama:
+#        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - mynetwork
+
 #  ollama:
 #    image: ollama/ollama
 #    container_name: journex-ollama
@@ -46,24 +64,6 @@ services:
 #      interval: 120s
 #      retries: 1
 #      start_period: 240s
-#    networks:
-#      - mynetwork
-
-#  journex:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile-journex
-#    container_name: journex-app
-#    ports:
-#      - "9090:9090"
-#    depends_on:
-#      mysql:
-#        condition: service_healthy
-#      ollama:
-#        condition: service_healthy
-#      redis:
-#        condition: service_healthy
-#    restart: unless-stopped
 #    networks:
 #      - mynetwork
 

@@ -29,7 +29,8 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring.version>3.3.3</spring.version>
+        <spring-boot.version>3.3.3</spring-boot.version>
+        <mvn.version>3.9.8</mvn.version>
         <spring-ai.version>2.0.0</spring-ai.version>
         <springdoc.veriosn>2.0.4</springdoc.veriosn>
         <swagger.version>1.6.8</swagger.version>
@@ -205,6 +206,37 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>${mvn.version}</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
