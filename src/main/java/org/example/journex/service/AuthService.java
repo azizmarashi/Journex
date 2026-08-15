@@ -60,9 +60,6 @@ public class AuthService {
     @Value("${jwt.lockoutDurationMinutes}")
     private long lockoutDurationMinutes;
 
-    @Value("${jwt.bearerPrefix}")
-    private String bearerPrefix;
-
     private SecretKey key;
 
     private static final String BEARER_PREFIX = "Bearer ";
