@@ -43,12 +43,12 @@ public class StrategyController {
     }
 
     @GetMapping("/find-all")
-    public Page<StrategyDto> findAll(Pagination pagination) {
+    public Page<StrategyDto> findAll(@ModelAttribute Pagination pagination) {
         return strategyService.findAll(pagination);
     }
 
     @GetMapping("/find-all-deleted")
-    public Page<StrategyDto> findAllDeleted(Pagination pagination) {
+    public Page<StrategyDto> findAllDeleted(@ModelAttribute Pagination pagination) {
         return strategyService.findAllDeleted(pagination);
     }
 

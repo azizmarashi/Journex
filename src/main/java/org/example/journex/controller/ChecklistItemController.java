@@ -56,7 +56,7 @@ public class ChecklistItemController {
     @GetMapping("/checklist/{checklistId}")
     public Page<ChecklistItemDto> findAllByChecklistId(
             @PathVariable Long checklistId,
-            Pagination pagination) {
+            @ModelAttribute Pagination pagination) {
         return checklistItemService.findAllByChecklistId(checklistId, pagination);
     }
 

@@ -1,5 +1,6 @@
 package org.example.journex.model;
 
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,21 @@ import org.springframework.data.domain.Sort;
 @AllArgsConstructor
 public class Pagination {
 
-    private int page;
-    private int size;
-    private String sortBy;
-    private Sort.Direction direction;
+    @Min(0)
+    private int page = 0;
+
+    @Min(1)
+    private int size = 10;
+
+    private String sortBy = "id";
+
+    private Sort.Direction direction = Sort.Direction.DESC;
 
     public Pageable toPageable() {
-        return PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return PageRequest.of(
+                page,
+                size,
+                Sort.by(direction, sortBy)
+        );
     }
-
 }

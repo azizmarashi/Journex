@@ -9,6 +9,7 @@ import org.example.journex.dao.UserRepository;
 import org.example.journex.domain.User;
 import org.example.journex.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +27,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @ComponentScan
@@ -41,6 +47,9 @@ public class SecurityConfig extends OncePerRequestFilter {
     @Lazy
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Override
     protected void doFilterInternal(
@@ -73,6 +82,7 @@ public class SecurityConfig extends OncePerRequestFilter {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -88,6 +98,24 @@ public class SecurityConfig extends OncePerRequestFilter {
                 .addFilterBefore(this, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        List<String> origins = Arrays.stream(frontendUrl.split(","))
+                .map(String::trim)
+                .toList();
+        config.setAllowedOrigins(origins);
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean

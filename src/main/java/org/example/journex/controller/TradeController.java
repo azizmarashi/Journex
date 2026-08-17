@@ -53,22 +53,22 @@ public class TradeController {
     }
 
     @GetMapping
-    public Page<TradeDto> findAllByUserId(Pagination pagination) {
+    public Page<TradeDto> findAllByUserId(@ModelAttribute Pagination pagination) {
         return tradeService.findAllByUserId(pagination);
     }
 
     @GetMapping("/status")
-    public Page<TradeDto> findAllByStatus(@RequestParam TradeStatus status, Pagination pagination) {
+    public Page<TradeDto> findAllByStatus(@RequestParam TradeStatus status, @ModelAttribute Pagination pagination) {
         return tradeService.findAllByStatus(status, pagination);
     }
 
     @GetMapping("/strategy/{strategyId}")
-    public Page<TradeDto> findAllByStrategyId(@PathVariable Long strategyId, Pagination pagination) {
+    public Page<TradeDto> findAllByStrategyId(@PathVariable Long strategyId, @ModelAttribute Pagination pagination) {
         return tradeService.findAllByStrategyId(strategyId, pagination);
     }
 
     @GetMapping("/trash")
-    public Page<TradeDto> findAllDeletedByUserId(Pagination pagination) {
+    public Page<TradeDto> findAllDeletedByUserId(@ModelAttribute Pagination pagination) {
         return tradeService.findAllDeletedByUserId(pagination);
     }
 

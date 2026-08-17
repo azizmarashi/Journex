@@ -28,22 +28,22 @@ public class ChecklistController {
     }
 
     @GetMapping("/find-all")
-    public Page<ChecklistDto> findAll(Pagination pagination) {
+    public Page<ChecklistDto> findAll(@ModelAttribute Pagination pagination) {
         return checklistService.findAllByUserId(pagination);
     }
 
     @GetMapping("/find-all-actives")
-    public Page<ChecklistDto> findAllActives(Pagination pagination) {
+    public Page<ChecklistDto> findAllActives(@ModelAttribute Pagination pagination) {
         return checklistService.findAllActives(pagination);
     }
 
     @GetMapping("/find-by-strategy/{strategyId}")
-    public Page<ChecklistDto> findActivesByStrategyId(@PathVariable Long strategyId, Pagination pagination) {
+    public Page<ChecklistDto> findActivesByStrategyId(@PathVariable Long strategyId, @ModelAttribute Pagination pagination) {
         return checklistService.findActivesByStrategyId(strategyId, pagination);
     }
 
     @GetMapping("/find-all-deleted")
-    public Page<ChecklistDto> findAllDeleted(Pagination pagination) {
+    public Page<ChecklistDto> findAllDeleted(@ModelAttribute Pagination pagination) {
         return checklistService.findAllDeleted(pagination);
     }
 
